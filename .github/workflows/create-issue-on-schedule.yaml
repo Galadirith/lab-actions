@@ -65,9 +65,11 @@ jobs:
         close-previous: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        ISSUE_NUMBER: ${{ steps.create_issue.outputs.issue-number }}
     - name: Get issue data
       id: get_issue_data
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        ISSUE_NUMBER: ${{ steps.create_issue.outputs.issue-number }}
       run: |
         gh api graphql -f query='
           query($owner:String!, $name:String!, $number:Int!) {
