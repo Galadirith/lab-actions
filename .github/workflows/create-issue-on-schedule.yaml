@@ -72,13 +72,13 @@ jobs:
         ISSUE_NUMBER: ${{ steps.create_issue.outputs.issue-number }}
       run: |
         gh api graphql -f query='
-          query($owner:String!, $name:String!, $number:Int!) {
-            repository(name: $name, owner: $owner) {
-              issue(number: $issue_number) {
+          query($name: String!, $owner: String!, $number:Int!) {
+            repository(owner: $owner, name: $name) {
+              issue(number: $number) {
                 id
               }
             }
-          }' -F owner='{owner}' -F name='{repo}' -F number=ISSUE_NUMBER > issue_data.json
+          }' -F owner=${{env.GITHUB_REPOSITORY_OWNER}}' -F name='{repo}' -F number=${{env.ISSUE_NUMBER}} > issue_data.json
     - name: Cat issue_data.json
       run: cat issue_data.json
 #     - name: Get project data
