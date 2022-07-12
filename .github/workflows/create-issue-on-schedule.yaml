@@ -4,6 +4,7 @@ name: Create issue on schedule
 on:
   schedule:
     - cron: 20 11 * * *
+  workflow_dispatch:
 
 jobs:
   create_issue:
