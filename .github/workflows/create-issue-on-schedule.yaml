@@ -56,7 +56,7 @@ jobs:
       uses: imjohnbo/issue-bot@3daae12aa54d38685d7ff8459fc8a2aee8cea98b
       with:
         assignees: "galadirith"
-        title: ""
+        title: ${{env.ISSUE_TITLE}}
         body: ${{env.ISSUE_BODY}}
         pinned: false
         close-previous: false
