@@ -80,7 +80,7 @@ jobs:
                 id
               }
             }
-          }' -F owner=${{env.REPO_OWNER}}' -F name=${{env.REPO_NAME}} -F number=${{env.ISSUE_NUMBER}} > issue_data.json
+          }' -F owner=${{env.REPO_OWNER}} -F name=${{env.REPO_NAME}} -F number=${{env.ISSUE_NUMBER}} > issue_data.json
     - name: Cat issue_data.json
       run: cat issue_data.json
 #     - name: Get project data
