@@ -87,6 +87,32 @@ jobs:
     - name: Get project data
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      # run: |
+      #   gh api graphql -f query='
+      #     query($user: String!, $number: Int!) {
+      #       user(login: $user){
+      #         projectV2(number: $number) {
+      #           id
+      #           fields(first:20) {
+      #             nodes {
+      #               ... on ProjectV2Field {
+      #                 id
+      #                 name
+      #               }
+      #               ... on ProjectV2SingleSelectField {
+      #                 id
+      #                 name
+      #                 options {
+      #                   id
+      #                   name
+      #                 }
+      #               }
+      #             }
+      #           }
+      #         }
+      #       }
+      #     }' -f user=$PROJECT_OWNER -F number=$PROJECT_NUMBER > project_data.json
+
       run: |
         gh api graphql -f query='
           query($user: String!, $number: Int!) {
@@ -111,7 +137,7 @@ jobs:
                 }
               }
             }
-          }' -f user=$PROJECT_OWNER -F number=$PROJECT_NUMBER > project_data.json
+          }' -f user=galadirith -F number=3 > project_data.json
 
         echo 'PROJECT_ID='$(jq '.data.organization.projectV2.id' project_data.json) >> $GITHUB_ENV
         echo 'STATUS_FIELD_ID='$(jq '.data.organization.projectV2.fields.nodes[] | select(.name== "Status") | .id' project_data.json) >> $GITHUB_ENV
