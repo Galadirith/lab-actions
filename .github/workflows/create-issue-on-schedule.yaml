@@ -138,13 +138,14 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
-        sleep 8
         gh api graphql -f query='
           mutation (
             $project: ID!
             $item: ID!
             $status_field: ID!
             $status_value: String!
+            $class_field: ID!
+            $class_value: String!
           ) {
             set_status: updateProjectV2ItemFieldValue(input: {
               projectId: $project
@@ -158,7 +159,41 @@ jobs:
                 id
               }
             }
-          }' -f project=$PROJECT_ID -f item=$ITEM_ID -f status_field=$STATUS_FIELD_ID -f status_value=$TODO_OPTION_ID
+            set_class: updateProjectV2ItemFieldValue(input: {
+              projectId: $project
+              itemId: $item
+              fieldId: $class_field
+              value: { 
+                singleSelectOptionId: $class_value
+              }
+            }) {
+              projectV2Item {
+                id
+              }
+            }
+          }' -f project=PVT_kwHOABJW084AD4BE -f item=PVTI_lAHOABJW084AD4BEzgBrMRM -f status_field=PVTSSF_lAHOABJW084AD4BEzgCO0K0 -f status_value=f75ad846 -f class_field=PVTSSF_lAHOABJW084AD4BEzgCO0Sk -f class_value=049edddc
+      # run: |
+      #   sleep 8
+      #   gh api graphql -f query='
+      #     mutation (
+      #       $project: ID!
+      #       $item: ID!
+      #       $status_field: ID!
+      #       $status_value: String!
+      #     ) {
+      #       set_status: updateProjectV2ItemFieldValue(input: {
+      #         projectId: $project
+      #         itemId: $item
+      #         fieldId: $status_field
+      #         value: { 
+      #           singleSelectOptionId: $status_value
+      #         }
+      #       }) {
+      #         projectV2Item {
+      #           id
+      #         }
+      #       }
+      #     }' -f project=$PROJECT_ID -f item=$ITEM_ID -f status_field=$STATUS_FIELD_ID -f status_value=$TODO_OPTION_ID
     # - name: Set fields
     #   env:
     #     GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
