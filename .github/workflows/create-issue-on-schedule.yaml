@@ -70,6 +70,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         ISSUE_NUMBER: ${{ steps.create_issue.outputs.issue-number }}
+        REPO_NAME: "lab-actions"
+        REPO_OWNER: "galadirith"
       run: |
         gh api graphql -f query='
           query($name: String!, $owner: String!, $number:Int!) {
@@ -78,7 +80,7 @@ jobs:
                 id
               }
             }
-          }' -F owner=${{env.GITHUB_REPOSITORY_OWNER}}' -F name='{repo}' -F number=${{env.ISSUE_NUMBER}} > issue_data.json
+          }' -F owner=${{env.REPO_OWNER}}' -F name=${{env.REPO_NAME}} -F number=${{env.ISSUE_NUMBER}} > issue_data.json
     - name: Cat issue_data.json
       run: cat issue_data.json
 #     - name: Get project data
