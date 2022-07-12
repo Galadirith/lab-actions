@@ -136,7 +136,7 @@ jobs:
           echo 'ITEM_ID='$item_id >> $GITHUB_ENV
     - name: Set fields
       env:
-        GITHUB_TOKEN: ${{ secrets.YOUR_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
         gh api graphql -f query='
           mutation (
