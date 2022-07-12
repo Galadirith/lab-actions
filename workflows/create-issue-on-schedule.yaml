@@ -1,0 +1,63 @@
+# https://docs.github.com/en/actions/managing-issues-and-pull-requests/scheduling-issue-creation
+
+name: Create issue on schedule
+on:
+  schedule:
+    - cron: 20 11 * * *
+
+jobs:
+  create_issue:
+    name: Create issue
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.10
+    - name: Generate issue body
+      shell: python
+      run: |
+        from datetime import datetime, timedelta
+        import os
+        now =datetime.now()
+        title = now.strftime('%Y-W%W')
+        start = now - timedelta(days=now.weekday())
+        stop = now + timedelta(days=-now.weekday(), weeks=1)
+        properties = (
+            f'## Properties\n'
+            f'\n'
+            f'- *Start:* {start.strftime("%Y-%m-%dT00:00:00")}\n'
+            f'- *Stop:* {stop.strftime("%Y-%m-%dT00:00:00")}')
+        days = '## Days\n\n' + '\n'.join([
+            f'- [{(start+timedelta(days=d)).strftime("%Y-%m-%d")}](URL)'
+            for d in range(7)])
+        issue_body = (
+            f'\n'
+            f'\n'
+            f'{properties}\n'
+            f'\n'
+            f'## Orbit\n'
+            f'\n'
+            f'\n'
+            f'\n'
+            f'{days}\n'
+            f'\n'
+            f'## References\n'
+            f'\n'
+            f'\n'
+            )
+        with open(os.getenv('GITHUB_ENV'), 'a') as f:
+            f.write(f'ISSUE_BODY="{issue_body}"\n')
+            f.write(f'ISSUE_TITLE="{now.strftime("%Y-%m-%dT%H:%M:%S")}"\n')
+      - name: Create issue
+        uses: imjohnbo/issue-bot@3daae12aa54d38685d7ff8459fc8a2aee8cea98b
+        with:
+          assignees: "galadirith"
+          title: ""
+          body: ${{env.ISSUE_BODY}}
+          pinned: false
+          close-previous: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
