@@ -6,6 +6,12 @@ on:
     - cron: 20 11 * * *
   workflow_dispatch:
 
+env:
+  REPO_OWNER: "galadirith"
+  REPO_NAME: "lab-actions"
+  PROJECT_OWNER: "galadirith"
+  PROJECT_NUMBER: 3
+
 jobs:
   create_issue:
     name: Create issue
@@ -52,8 +58,6 @@ jobs:
         with open(os.getenv('GITHUB_ENV'), 'a') as f:
             f.write(f'ISSUE_BODY<<EOF\n{issue_body}\nEOF\n')
             f.write(f'ISSUE_TITLE={now.strftime("%Y-%m-%dT%H:%M:%S")}\n')
-    - name: Cat env
-      run: cat ${GITHUB_ENV}
     - name: Create issue
       id: create_issue
       uses: imjohnbo/issue-bot@3daae12aa54d38685d7ff8459fc8a2aee8cea98b
@@ -70,69 +74,65 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         ISSUE_NUMBER: ${{ steps.create_issue.outputs.issue-number }}
-        REPO_NAME: "lab-actions"
-        REPO_OWNER: "galadirith"
       run: |
-        gh api graphql -f query='
+        issue_id="$(gh api graphql -f query='
           query($name: String!, $owner: String!, $number:Int!) {
             repository(owner: $owner, name: $name) {
               issue(number: $number) {
                 id
               }
             }
-          }' -F owner=${{env.REPO_OWNER}} -F name=${{env.REPO_NAME}} -F number=${{env.ISSUE_NUMBER}} > issue_data.json
-    - name: Cat issue_data.json
-      run: cat issue_data.json
-#     - name: Get project data
-#       env:
-#         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-#         USER: galadirith
-#         PROJECT_NUMBER: 3
-#       run: |
-#         gh api graphql -f query='
-#           query($user: String!, $number: Int!) {
-#             user(login: $user){
-#               projectV2(number: $number) {
-#                 id
-#                 fields(first:20) {
-#                   nodes {
-#                     ... on ProjectV2Field {
-#                       id
-#                       name
-#                     }
-#                     ... on ProjectV2SingleSelectField {
-#                       id
-#                       name
-#                       options {
-#                         id
-#                         name
-#                       }
-#                     }
-#                   }
-#                 }
-#               }
-#             }
-#           }' -f user=$USER -F number=$PROJECT_NUMBER > project_data.json
+          }' -F owner=$REPO_OWNER -F name=$REPO_NAME -F number=$ISSUE_NUMBER --jq '.data.repository.issue.id')"
+        echo 'ISSUE_ID='$issue_id >> $GITHUB_ENV
+    - name: Get project data
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      run: |
+        gh api graphql -f query='
+          query($user: String!, $number: Int!) {
+            user(login: $user){
+              projectV2(number: $number) {
+                id
+                fields(first:20) {
+                  nodes {
+                    ... on ProjectV2Field {
+                      id
+                      name
+                    }
+                    ... on ProjectV2SingleSelectField {
+                      id
+                      name
+                      options {
+                        id
+                        name
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }' -f user=$PROJECT_OWNER -F number=$PROJECT_NUMBER > project_data.json
 
-#         echo 'PROJECT_ID='$(jq '.data.organization.projectV2.id' project_data.json) >> $GITHUB_ENV
-#         echo 'STATUS_FIELD_ID='$(jq '.data.organization.projectV2.fields.nodes[] | select(.name== "Status") | .id' project_data.json) >> $GITHUB_ENV
-#         echo 'TODO_OPTION_ID='$(jq '.data.organization.projectV2.fields.nodes[] | select(.name== "Status") | .options[] | select(.name=="Todo") |.id' project_data.json) >> $GITHUB_ENV
-#         echo 'CLASS_FIELD_ID='$(jq '.data.organization.projectV2.fields.nodes[] | select(.name== "Class") | .id' project_data.json) >> $GITHUB_ENV
-#         echo 'SATELLITE_OPTION_ID='$(jq '.data.organization.projectV2.fields.nodes[] | select(.name== "Status") | .options[] | select(.name=="Satellite") |.id' project_data.json) >> $GITHUB_ENV
+        echo 'PROJECT_ID='$(jq '.data.organization.projectV2.id' project_data.json) >> $GITHUB_ENV
+        echo 'STATUS_FIELD_ID='$(jq '.data.organization.projectV2.fields.nodes[] | select(.name== "Status") | .id' project_data.json) >> $GITHUB_ENV
+        echo 'TODO_OPTION_ID='$(jq '.data.organization.projectV2.fields.nodes[] | select(.name== "Status") | .options[] | select(.name=="Todo") |.id' project_data.json) >> $GITHUB_ENV
+        echo 'CLASS_FIELD_ID='$(jq '.data.organization.projectV2.fields.nodes[] | select(.name== "Class") | .id' project_data.json) >> $GITHUB_ENV
+        echo 'SATELLITE_OPTION_ID='$(jq '.data.organization.projectV2.fields.nodes[] | select(.name== "Status") | .options[] | select(.name=="Satellite") |.id' project_data.json) >> $GITHUB_ENV
 
 
-#     - name: Add issue to project
-#       env:
-#         GITHUB_TOKEN: ${{ secrets.YOUR_TOKEN }}
-#         ISSUE_ID: ${{ github.event.pull_request.node_id }}
-#       run: |
-#         item_id="$( gh api graphql -f query='
-#           mutation($project:ID!, $issue:ID!) {
-#             addProjectV2ItemById(input: {projectId: $project, contentId: $issue}) {
-#               item {
-#                 id
-#               }
-#             }
-#           }' -f project=$PROJECT_ID -f pr=$ISSUE_ID --jq '.data.addProjectV2ItemById.item.id')"
+    - name: Add issue to project
+      env:
+        GITHUB_TOKEN: ${{ secrets.YOUR_TOKEN }}
+      run: |
+        item_id="$( gh api graphql -f query='
+          mutation($project:ID!, $issue:ID!) {
+            addProjectV2ItemById(input: {projectId: $project, contentId: $issue}) {
+              item {
+                id
+              }
+            }
+          }' -f project_id=$PROJECT_ID -f issue_id=$ISSUE_ID --jq '.data.addProjectV2ItemById.item.id')"
 
-#           echo 'ITEM_ID='$item_id >> $GITHUB_ENV
+          echo 'ITEM_ID='$item_id >> $GITHUB_ENV
+    - name: Cat env
+      run: cat ${GITHUB_ENV}
