@@ -171,7 +171,7 @@ jobs:
                 id
               }
             }
-          }' -f project=PVT_kwHOABJW084AD4BE -f item=PVTI_lAHOABJW084AD4BEzgBrMRM -f status_field=PVTSSF_lAHOABJW084AD4BEzgCO0K0 -f status_value=f75ad846 -f class_field=PVTSSF_lAHOABJW084AD4BEzgCO0Sk -f class_value=049edddc
+          }' -f project=PVT_kwHOABJW084AD4BE -f item=PVTI_lAHOABJW084AD4BEzgBrMRM -f status_field=$STATUS_FIELD_ID -f status_value=$TODO_OPTION_ID -f class_field=$CLASS_FIELD_ID -f class_value=$SATELLITE_OPTION_ID
       # run: |
       #   sleep 8
       #   gh api graphql -f query='
