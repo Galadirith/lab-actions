@@ -51,13 +51,13 @@ jobs:
         with open(os.getenv('GITHUB_ENV'), 'a') as f:
             f.write(f'ISSUE_BODY="{issue_body}"\n')
             f.write(f'ISSUE_TITLE="{now.strftime("%Y-%m-%dT%H:%M:%S")}"\n')
-      - name: Create issue
-        uses: imjohnbo/issue-bot@3daae12aa54d38685d7ff8459fc8a2aee8cea98b
-        with:
-          assignees: "galadirith"
-          title: ""
-          body: ${{env.ISSUE_BODY}}
-          pinned: false
-          close-previous: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create issue
+      uses: imjohnbo/issue-bot@3daae12aa54d38685d7ff8459fc8a2aee8cea98b
+      with:
+        assignees: "galadirith"
+        title: ""
+        body: ${{env.ISSUE_BODY}}
+        pinned: false
+        close-previous: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
