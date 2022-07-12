@@ -122,11 +122,11 @@ jobs:
 
     - name: Add issue to project
       env:
-        GITHUB_TOKEN: ${{ secrets.YOUR_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
         item_id="$( gh api graphql -f query='
-          mutation($project:ID!, $issue:ID!) {
-            addProjectV2ItemById(input: {projectId: $project, contentId: $issue}) {
+          mutation($project_id:ID!, $issue_id:ID!) {
+            addProjectV2ItemById(input: {projectId: $project_id, contentId: $issue_id}) {
               item {
                 id
               }
