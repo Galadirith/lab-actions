@@ -38,7 +38,7 @@ jobs:
             f'- *Start:* {start.strftime("%Y-%m-%dT00:00:00")}\n'
             f'- *Stop:* {stop.strftime("%Y-%m-%dT00:00:00")}')
         days = '## Days\n\n' + '\n'.join([
-            f'- [{(start+timedelta(days=d)).strftime("%Y-%m-%d")}]({(start+timedelta(days=d)).strftime("%Y%m%d")}_COMMENT_URL)'
+            f'- [{(start+timedelta(days=d)).strftime("%Y-%m-%d")}](#{(start+timedelta(days=d)).strftime("%Y%m%d")}_COMMENT_URL)'
             for d in range(7)])
         issue_body = (
             f'\n'
