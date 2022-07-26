@@ -2,8 +2,8 @@
 
 name: Create issue on schedule
 on:
-  schedule:
-    - cron: 20 11 * * *
+#   schedule:
+#     - cron: 20 11 * * *
   workflow_dispatch:
 
 env:
